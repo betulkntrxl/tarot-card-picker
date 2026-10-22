@@ -30,7 +30,7 @@ const cards: Card[] = [
   { name: 'The World', numeral: 'XXI', upright: 'Completion, belonging & wholeness', reversed: 'Loose ends, delay & an unfinished lesson', reflection: 'What deserves to be completed and celebrated before you move on?', art: 10 },
 ];
 
-type Selected = Card & { reversed: boolean };
+type Selected = Card & { isReversed: boolean };
 
 const suitThemes = {
   Wands: ['energy', 'purpose', 'creative fire'],
@@ -74,7 +74,7 @@ export default function Home() {
   };
   const choose = (card: Card) => {
     if (selected.length >= targetCount || selected.some((item) => item.name === card.name)) return;
-    const choice = { ...card, reversed: Math.random() < 0.5 };
+    const choice = { ...card, isReversed: Math.random() < 0.5 };
     setSelected((items) => [...items, choice]);
     setFocused(choice);
   };
@@ -96,7 +96,7 @@ export default function Home() {
           const { name, orientation } = input as { name?: string; orientation?: string };
           const card = fullDeck.find((item) => item.name.toLowerCase() === name?.toLowerCase());
           if (!card || (orientation !== 'upright' && orientation !== 'reversed')) throw new Error('Choose a valid card name and orientation.');
-          const choice = { ...card, reversed: orientation === 'reversed' };
+          const choice = { ...card, isReversed: orientation === 'reversed' };
           setSelected((items) => items.length < targetCount && !items.some((item) => item.name === card.name) ? [...items, choice] : items);
           setFocused(choice);
           return { name: card.name, orientation };
@@ -114,8 +114,8 @@ export default function Home() {
         <a className="about-link" href="#about">About the deck <ArrowRight size={14} /></a>
       </nav>
       <section id="top" className="picker-intro"><p className="eyebrow">A complete 78-card tarot deck</p><h1>Choose by instinct.<br /><em>Reveal by chance.</em></h1><p className="intro">Pick a card, then reveal your destiny...</p><div className="count-picker" aria-label="Choose number of tarot cards"><span>How many cards?</span><div>{Array.from({ length: 10 }, (_, index) => index + 1).map((count) => <button key={count} className={targetCount === count ? 'active' : ''} onClick={() => chooseCount(count)} aria-pressed={targetCount === count}>{count}</button>)}</div></div></section>
-      <section className="spread-board" aria-label={`Your ${targetCount}-card spread`}><div className="browser-heading"><p>Your spread · {selected.length} of {targetCount} chosen</p><button onClick={clearSpread} disabled={selected.length === 0}><X /> Clear spread</button></div><div className="spread-grid" data-count={targetCount} style={{ gridTemplateColumns: `repeat(${targetCount === 8 ? 4 : targetCount > 5 ? 5 : targetCount}, minmax(0, 1fr))` }}>{Array.from({ length: targetCount }, (_, index) => { const card = selected[index]; return card ? <button className="spread-card" key={card.name} onClick={() => setFocused(card)}><span className={`spread-art ${card.reversed ? 'is-reversed' : ''}`} style={{ backgroundPosition: `${(card.art % 4) * 33.333}% ${Math.floor(card.art / 4) * 50}%` }} /><small>{card.name}<i>{card.reversed ? 'Reversed' : 'Upright'}</i></small></button> : <div className="spread-slot" key={index}><span>{index + 1}</span></div>; })}</div></section>
-      {focused && <section className="quick-reading" aria-live="polite"><p><span>{focused.reversed ? 'Reversed' : 'Upright'}</span>{focused.name}</p><h2>{focused.reversed ? focused.reversed : focused.upright}</h2><blockquote>{focused.reflection}</blockquote></section>}
+      <section className="spread-board" aria-label={`Your ${targetCount}-card spread`}><div className="browser-heading"><p>Your spread · {selected.length} of {targetCount} chosen</p><button onClick={clearSpread} disabled={selected.length === 0}><X /> Clear spread</button></div><div className="spread-grid" data-count={targetCount} style={{ gridTemplateColumns: `repeat(${targetCount === 8 ? 4 : targetCount > 5 ? 5 : targetCount}, minmax(0, 1fr))` }}>{Array.from({ length: targetCount }, (_, index) => { const card = selected[index]; return card ? <button className="spread-card" key={card.name} onClick={() => setFocused(card)}><span className={`spread-art ${card.isReversed ? 'is-reversed' : ''}`} style={{ backgroundPosition: `${(card.art % 4) * 33.333}% ${Math.floor(card.art / 4) * 50}%` }} /><small>{card.name}<i>{card.isReversed ? 'Reversed' : 'Upright'}</i></small></button> : <div className="spread-slot" key={index}><span>{index + 1}</span></div>; })}</div></section>
+      {focused && <section className="quick-reading" aria-live="polite"><p><span>{focused.isReversed ? 'Reversed' : 'Upright'}</span>{focused.name}</p><h2>{focused.isReversed ? focused.reversed : focused.upright}</h2><blockquote>{focused.reflection}</blockquote></section>}
       <section className="deck-browser" aria-label="Shuffled 78-card tarot deck"><div className="browser-heading"><p>Pick from the deck</p><button onClick={shuffleDeck}><Shuffle /> Shuffle</button></div><div className="full-deck-grid">{deck.map((card, index) => { const picked = selected.some((item) => item.name === card.name); return <button className={`deck-pick ${picked ? 'picked' : ''}`} disabled={picked || selected.length >= targetCount} key={card.name} onClick={() => choose(card)} aria-label={picked ? `Card ${index + 1}, chosen` : `Choose hidden card ${index + 1}`}><span>☾</span><small>{index + 1}</small></button>; })}</div></section>
       <section id="about" className="about-compact"><strong>About this deck</strong><span>78 cards · 22 Major Arcana · 56 Minor Arcana · upright & reversed</span><em>Symbols, not answers.</em></section>
       <footer><span>ARCANA</span><p>Made for moments of reflection.</p><span>XXI · MMXXVI</span></footer>
