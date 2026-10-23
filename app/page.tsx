@@ -18,16 +18,16 @@ const cards: Card[] = [
   { name: 'The Hermit', numeral: 'IX', upright: 'Solitude, insight & inner guidance', reversed: 'Isolation, withdrawal & avoiding wisdom', reflection: 'What truth can only be heard in a little more quiet?', art: 9 },
   { name: 'Wheel of Fortune', numeral: 'X', upright: 'Cycles, change & turning fortune', reversed: 'Resistance, setbacks & repeating patterns', reflection: 'What cycle are you ready to meet differently this time?', art: 10 },
   { name: 'Justice', numeral: 'XI', upright: 'Truth, balance & accountability', reversed: 'Avoidance, unfairness & blurred truth', reflection: 'What becomes possible when you name the situation plainly?', art: 11 },
-  { name: 'The Hanged One', numeral: 'XII', upright: 'Surrender, pause & a new perspective', reversed: 'Stalling, resistance & needless sacrifice', reflection: 'What changes when you stop pushing and turn the question around?', art: 2 },
-  { name: 'Death', numeral: 'XIII', upright: 'Ending, release & transformation', reversed: 'Clinging, stagnation & fear of change', reflection: 'What has ended in spirit, even if you have not released it in form?', art: 9 },
-  { name: 'Temperance', numeral: 'XIV', upright: 'Harmony, patience & integration', reversed: 'Excess, friction & competing extremes', reflection: 'Which two parts of your life are asking to be blended?', art: 1 },
-  { name: 'The Devil', numeral: 'XV', upright: 'Attachment, appetite & the material shadow', reversed: 'Release, awareness & reclaimed agency', reflection: 'What has power over you only while it remains unnamed?', art: 4 },
-  { name: 'The Tower', numeral: 'XVI', upright: 'Revelation, rupture & sudden truth', reversed: 'Averted change, private upheaval & fear', reflection: 'What false structure is becoming too costly to maintain?', art: 7 },
-  { name: 'The Star', numeral: 'XVII', upright: 'Hope, renewal & quiet inspiration', reversed: 'Discouragement, disconnection & doubt', reflection: 'What small sign of renewal deserves your attention?', art: 10 },
-  { name: 'The Moon', numeral: 'XVIII', upright: 'Dreams, uncertainty & the unseen', reversed: 'Confusion lifting & hidden fear revealed', reflection: 'Can you stay curious while the whole path is not yet visible?', art: 0 },
-  { name: 'The Sun', numeral: 'XIX', upright: 'Joy, vitality & clear success', reversed: 'Delayed joy, dimmed confidence & excess', reflection: 'Where can you let yourself be seen without apology?', art: 3 },
-  { name: 'Judgement', numeral: 'XX', upright: 'Awakening, reckoning & a true calling', reversed: 'Self-doubt, avoidance & refusing the call', reflection: 'What old verdict about yourself are you ready to reconsider?', art: 11 },
-  { name: 'The World', numeral: 'XXI', upright: 'Completion, belonging & wholeness', reversed: 'Loose ends, delay & an unfinished lesson', reflection: 'What deserves to be completed and celebrated before you move on?', art: 10 },
+  { name: 'The Hanged One', numeral: 'XII', upright: 'Surrender, pause & a new perspective', reversed: 'Stalling, resistance & needless sacrifice', reflection: 'What changes when you stop pushing and turn the question around?', art: 12 },
+  { name: 'Death', numeral: 'XIII', upright: 'Ending, release & transformation', reversed: 'Clinging, stagnation & fear of change', reflection: 'What has ended in spirit, even if you have not released it in form?', art: 13 },
+  { name: 'Temperance', numeral: 'XIV', upright: 'Harmony, patience & integration', reversed: 'Excess, friction & competing extremes', reflection: 'Which two parts of your life are asking to be blended?', art: 14 },
+  { name: 'The Devil', numeral: 'XV', upright: 'Attachment, appetite & the material shadow', reversed: 'Release, awareness & reclaimed agency', reflection: 'What has power over you only while it remains unnamed?', art: 15 },
+  { name: 'The Tower', numeral: 'XVI', upright: 'Revelation, rupture & sudden truth', reversed: 'Averted change, private upheaval & fear', reflection: 'What false structure is becoming too costly to maintain?', art: 16 },
+  { name: 'The Star', numeral: 'XVII', upright: 'Hope, renewal & quiet inspiration', reversed: 'Discouragement, disconnection & doubt', reflection: 'What small sign of renewal deserves your attention?', art: 17 },
+  { name: 'The Moon', numeral: 'XVIII', upright: 'Dreams, uncertainty & the unseen', reversed: 'Confusion lifting & hidden fear revealed', reflection: 'Can you stay curious while the whole path is not yet visible?', art: 18 },
+  { name: 'The Sun', numeral: 'XIX', upright: 'Joy, vitality & clear success', reversed: 'Delayed joy, dimmed confidence & excess', reflection: 'Where can you let yourself be seen without apology?', art: 19 },
+  { name: 'Judgement', numeral: 'XX', upright: 'Awakening, reckoning & a true calling', reversed: 'Self-doubt, avoidance & refusing the call', reflection: 'What old verdict about yourself are you ready to reconsider?', art: 20 },
+  { name: 'The World', numeral: 'XXI', upright: 'Completion, belonging & wholeness', reversed: 'Loose ends, delay & an unfinished lesson', reflection: 'What deserves to be completed and celebrated before you move on?', art: 21 },
 ];
 
 type Selected = Card & { isReversed: boolean };
@@ -51,9 +51,26 @@ const minorCards: Card[] = Object.entries(suitThemes).flatMap(([suit, themes], s
   upright: `${rankNotes[rankIndex][0]} in ${themes[0]}, ${themes[1]} & ${themes[2]}`,
   reversed: `${rankNotes[rankIndex][1]} around ${themes[0]}, ${themes[1]} or ${themes[2]}`,
   reflection: `What is the ${suit.toLowerCase()} energy in this moment asking you to notice?`,
-  art: (suitIndex * 3 + rankIndex) % 12,
+  art: 22 + suitIndex * ranks.length + rankIndex,
 })));
 const fullDeck = [...cards, ...minorCards];
+
+const artPosition = (art: number) => `${(art % 15) * (100 / 14)}% ${Math.floor(art / 15) * 20}%`;
+
+function buildSummary(selected: Selected[]) {
+  const reversedCount = selected.filter((card) => card.isReversed).length;
+  const uprightCount = selected.length - reversedCount;
+  const meanings = selected.map((card) => (card.isReversed ? card.reversed : card.upright).split(',')[0].toLowerCase());
+  const suits = ['Wands', 'Cups', 'Swords', 'Pentacles'].map((suit) => ({ suit, count: selected.filter((card) => card.name.endsWith(`of ${suit}`)).length })).sort((a, b) => b.count - a.count);
+  const dominant = suits[0].count > 1 ? suits[0].suit : null;
+  const tone = reversedCount > uprightCount
+    ? 'This spread leans inward: the strongest movement is through reflection, release, and meeting what has been delayed.'
+    : reversedCount === uprightCount
+      ? 'The spread holds tension and possibility in equal measure, asking for patience before decisive action.'
+      : 'This spread carries forward momentum, with more energy available for visible choices and deliberate action.';
+  const suitNote = dominant ? ` ${dominant} appears most often, emphasizing ${suitThemes[dominant as keyof typeof suitThemes].join(', ')}.` : '';
+  return `${tone}${suitNote} Across the cards, the recurring invitation is to work with ${meanings.slice(0, 3).join(', ')}${meanings.length > 3 ? ', and the themes that connect them' : ''}. Let the final card—${selected[selected.length - 1].name}—be the question you carry forward.`;
+}
 
 export default function Home() {
   const [deck, setDeck] = useState<Card[]>(fullDeck);
@@ -114,8 +131,9 @@ export default function Home() {
         <a className="about-link" href="#about">About the deck <ArrowRight size={14} /></a>
       </nav>
       <section id="top" className="picker-intro"><p className="eyebrow">A complete 78-card tarot deck</p><h1>Choose by instinct.<br /><em>Reveal by chance.</em></h1><p className="intro">Pick a card, then reveal your destiny...</p><div className="count-picker" aria-label="Choose number of tarot cards"><span>How many cards?</span><div>{Array.from({ length: 10 }, (_, index) => index + 1).map((count) => <button key={count} className={targetCount === count ? 'active' : ''} onClick={() => chooseCount(count)} aria-pressed={targetCount === count}>{count}</button>)}</div></div></section>
-      <section className="spread-board" aria-label={`Your ${targetCount}-card spread`}><div className="browser-heading"><p>Your spread · {selected.length} of {targetCount} chosen</p><button onClick={clearSpread} disabled={selected.length === 0}><X /> Clear spread</button></div><div className="spread-grid" data-count={targetCount} style={{ gridTemplateColumns: `repeat(${targetCount === 8 ? 4 : targetCount > 5 ? 5 : targetCount}, minmax(0, 1fr))` }}>{Array.from({ length: targetCount }, (_, index) => { const card = selected[index]; return card ? <button className="spread-card" key={card.name} onClick={() => setFocused(card)}><span className={`spread-art ${card.isReversed ? 'is-reversed' : ''}`} style={{ backgroundPosition: `${(card.art % 4) * 33.333}% ${Math.floor(card.art / 4) * 50}%` }} /><small>{card.name}<i>{card.isReversed ? 'Reversed' : 'Upright'}</i></small></button> : <div className="spread-slot" key={index}><span>{index + 1}</span></div>; })}</div></section>
+      <section className="spread-board" aria-label={`Your ${targetCount}-card spread`}><div className="browser-heading"><p>Your spread · {selected.length} of {targetCount} chosen</p><button onClick={clearSpread} disabled={selected.length === 0}><X /> Clear spread</button></div><div className="spread-grid" data-count={targetCount} style={{ gridTemplateColumns: `repeat(${targetCount === 8 ? 4 : targetCount > 5 ? 5 : targetCount}, minmax(0, 1fr))` }}>{Array.from({ length: targetCount }, (_, index) => { const card = selected[index]; return card ? <button className="spread-card" key={card.name} onClick={() => setFocused(card)}><span className={`spread-art ${card.isReversed ? 'is-reversed' : ''}`} style={{ backgroundPosition: artPosition(card.art) }} /><small>{card.name}<i>{card.isReversed ? 'Reversed' : 'Upright'}</i></small></button> : <div className="spread-slot" key={index}><span>{index + 1}</span></div>; })}</div></section>
       {focused && <section className="quick-reading" aria-live="polite"><p><span>{focused.isReversed ? 'Reversed' : 'Upright'}</span>{focused.name}</p><h2>{focused.isReversed ? focused.reversed : focused.upright}</h2><blockquote>{focused.reflection}</blockquote></section>}
+      {selected.length === targetCount && <section className="spread-summary" aria-live="polite"><p>Your reading</p><h2>The pattern beneath the cards.</h2><div>{buildSummary(selected)}</div><blockquote>{selected[selected.length - 1].reflection}</blockquote></section>}
       <section className="deck-browser" aria-label="Shuffled 78-card tarot deck"><div className="browser-heading"><p>Pick from the deck</p><button onClick={shuffleDeck}><Shuffle /> Shuffle</button></div><div className="full-deck-grid">{deck.map((card, index) => { const picked = selected.some((item) => item.name === card.name); return <button className={`deck-pick ${picked ? 'picked' : ''}`} disabled={picked || selected.length >= targetCount} key={card.name} onClick={() => choose(card)} aria-label={picked ? `Card ${index + 1}, chosen` : `Choose hidden card ${index + 1}`}><span>☾</span><small>{index + 1}</small></button>; })}</div></section>
       <section id="about" className="about-compact"><strong>About this deck</strong><span>78 cards · 22 Major Arcana · 56 Minor Arcana · upright & reversed</span><em>Symbols, not answers.</em></section>
       <footer><span>ARCANA</span><p>Made for moments of reflection.</p><span>XXI · MMXXVI</span></footer>
